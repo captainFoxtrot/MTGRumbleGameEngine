@@ -1,54 +1,60 @@
 import { Action } from "./actions/Action";
+import { checkReplacementConditions, discoverReplacements } from "./effects/ReplacementEffect";
+import { discoverTriggers } from "./effects/TriggeredEffect";
 import { GameEvent } from "./GameEvent";
 import { GameState } from "./GameState";
 
 export function processEvent(
     state: GameState,
-    event: GameEvent,
+    evt: GameEvent,
     action: Action
 ): void {
-    event = beforeEventReplacementEffects(state, event);
+    evt = beforeEventReplacementEffects(state, evt);
 
-    if (event.preventEventExecution) {
+    if (evt.preventEventExecution) {
         return;
     }
 
-    event = beforeEventOngoingEffects(state, event);
+    action.Do(state, evt);
 
-    if (event.preventEventExecution) {
-        return;
-    }
-
-    action.Do(state, event);
-
-    afterEvent(state, event);
+    afterEvent(state, evt);
 }
 
 function beforeEventReplacementEffects(
     state: GameState,
-    event: GameEvent
+    evt: GameEvent
 ): GameEvent {
-    return event;
+    var effects = discoverReplacements(state, evt);
+
+    //Ask player to arrange effect order
+
+    for (const index in effects) {
+        if (!Object.hasOwn(effects, index)) continue;
+        const effect = effects[index]
+        const doesStillApply = checkReplacementConditions(effect.effect, state, evt, effect.cardInstance) && evt.type == effect.effect.replaceEventType;
+        if(doesStillApply) evt = effect.effect.replace(state,evt,effect.cardInstance);
+    }
+    return evt;
 }
 
 function beforeEventOngoingEffects(
     state: GameState,
-    event: GameEvent
+    evt: GameEvent
 ): GameEvent {
-    return event;
+    return evt;
 }
 
 function afterEvent(
     state: GameState,
-    event: GameEvent
+    evt: GameEvent
 ): void {
-    const triggers = state.triggeredEffects.filter(
-        trigger =>
-            trigger.eventType === event.type &&
-            trigger.condition(state, event)
-    );
+    let triggers = discoverTriggers(state,evt);
+    
+    //Ask players to arrange trigger order
 
-    for (const trigger of triggers) {
-        trigger.execute(state, event);
-    }
+    triggers.forEach(e => {
+        e.Behaviour.actions.forEach(a => {
+            a(state, e.Instance);
+        })
+    })
 }

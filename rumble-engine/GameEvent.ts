@@ -5,7 +5,7 @@ export interface GameEvent<TArgs = unknown> {
     type: EventType;
 
     sourceId?: string;
-    targetId: string;
+    targetId?: string;
 
     args: TArgs;
 

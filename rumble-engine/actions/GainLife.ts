@@ -4,32 +4,37 @@ import { GameEvent } from "../GameEvent";
 import { GameState } from "../GameState";
 import { Action } from "./Action";
 
-export class GainLife implements Action {
+export class GainLife extends Action {
 
-    Enqueue(
+    static override Enqueue(
         state: GameState,
         playerId: string,
-        args: any
+        args: expectedArgs
     ): void {
+        if(typeof args.amount !== "number") args.amount = 1;
+        var action = new GainLife();
         processEvent(state, {
             eventId: `E${++state.eventCounter}`,
             type: EventType.GainLife,
             targetId: playerId,
-            args: {
-                amount: args,
-            },
+            args: args,
             preventEventExecution: false,
             appliedEventReplacementIds: new Set(),
-        }, this);
+        }, action);
     }
 
     Do(state: GameState, event: GameEvent){
+        if(!event.targetId) {
+            throw new Error("TargetId is required for GainLife event.");
+        }
         const player = state.players[event.targetId];
 
-        const args = event.args as {
-            amount: number;
-        };
+        const args = event.args as expectedArgs;
 
         player.life += args.amount;
     }
+}
+
+interface expectedArgs {
+    amount: number;
 }

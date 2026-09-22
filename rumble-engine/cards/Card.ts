@@ -1,7 +1,9 @@
 import { CardType } from "../enums/CardType";
 import { Keyword } from "../enums/Keyword";
 import { SuperType } from "../enums/SuperType";
+import { Zone } from "../enums/Zone";
 import { CardBehavior } from "./CardBehavior";
+import { ReplacementEffect } from '../effects/ReplacementEffect';
 
 export interface Card {
     id: string;
@@ -24,6 +26,7 @@ export interface Card {
     keywords: Keyword[];
 
     behaviors: CardBehavior[];
+    replacements: ReplacementEffect[];
 }
 
 export interface CardInstance {
@@ -35,6 +38,13 @@ export interface CardInstance {
 
     tapped: boolean;
     damageMarked: number;
-    
+
     counters: Record<string, number>;
+}
+
+export interface CardRemnant {
+    instanceId: string;
+    card: Card;
+    zone: Zone;
+    controllerId: string;
 }

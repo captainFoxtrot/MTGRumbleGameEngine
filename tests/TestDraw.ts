@@ -79,9 +79,7 @@ function assert(
 function testDraw(): void {
     const state = createTestState();
 
-    const draw = new Draw();
-
-    draw.Enqueue(state, "P1", 1);
+    Draw.Enqueue(state, "P1", { amount: 1 });
 
     assert(
         state.players.P1.hand.length === 1,
