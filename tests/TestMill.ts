@@ -11,7 +11,8 @@ const testCard: Card = {
     supertypes: [],
     oracleText: "",
     keywords: [],
-    behaviors: []
+    behaviors: [],
+    replacements: []
 };
 
 function createCardInstance(

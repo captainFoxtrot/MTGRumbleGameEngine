@@ -32,7 +32,7 @@ const testCard:Card = {
             }],
             activeZones: [Zone.Battlefield],
             actions: [(gameState: GameState, self: CardInstance) => {
-                Draw.Enqueue(gameState, self.controllerId, { amount: 1 });
+                Draw.Enqueue(gameState, self.controllerId, { amount: 1, targetPlayerId: self.controllerId });
             }, (gameState: GameState, self: CardInstance) => {
                 var controller = self.controllerId;
                 var players = gameState.players;
@@ -40,7 +40,8 @@ const testCard:Card = {
                     if(playerId != controller) DealDamage.Enqueue(gameState, playerId, {
                             amount: 1,
                             targetType: TargetType.Player,
-                            targetPlayer: playerId
+                            targetPlayer: playerId,
+                            targetId: playerId
                     })
                 }
             }]

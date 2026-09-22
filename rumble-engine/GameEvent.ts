@@ -4,8 +4,8 @@ export interface GameEvent<TArgs = unknown> {
     eventId: string;
     type: EventType;
 
-    sourceId?: string;
-    targetId?: string;
+    sourceId: string;
+    targetId: string;
 
     args: TArgs;
 

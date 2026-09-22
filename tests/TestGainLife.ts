@@ -1,5 +1,6 @@
 import { GainLife } from "../rumble-engine/actions/GainLife";
 import { GameState } from "../rumble-engine/GameState";
+import { TargetType } from '../rumble-engine/enums/TargetType';
 
 function createTestState(): GameState {
     return {
@@ -74,7 +75,8 @@ function testGainLife(): void {
     const state = createTestState();
 
     GainLife.Enqueue(state, "P1", { 
-            amount: 1
+            amount: 1,
+            targetPlayerId: "P1"
      });
 
     assert(
@@ -88,7 +90,8 @@ function testGainLife(): void {
     );
 
     GainLife.Enqueue(state, "P2", { 
-            amount: 17
+            amount: 17,
+            targetPlayerId: "P2"
      });
     assert(
         state.players.P1.life === 41,

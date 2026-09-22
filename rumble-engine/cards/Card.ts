@@ -41,10 +41,3 @@ export interface CardInstance {
 
     counters: Record<string, number>;
 }
-
-export interface CardRemnant {
-    instanceId: string;
-    card: Card;
-    zone: Zone;
-    controllerId: string;
-}

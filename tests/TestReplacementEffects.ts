@@ -175,7 +175,8 @@ function testReplacementEffects(): void {
     const state = createTestState();
 
     Draw.Enqueue(state, "P1", { 
-        amount: 1
+        amount: 1,
+        targetPlayerId: "P1"
     })
 
     assert(
@@ -197,7 +198,8 @@ function testReplacementEffects(): void {
 
     
     Draw.Enqueue(state, "P2", { 
-        amount: 1
+        amount: 1,
+        targetPlayerId: "P2"
     })
 
     assert(

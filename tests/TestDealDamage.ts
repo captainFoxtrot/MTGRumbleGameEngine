@@ -77,7 +77,8 @@ function testDealDamage(): void {
     DealDamage.Enqueue(state, "P1", { 
             amount: 1,
             targetType: TargetType.Player,
-            targetPlayer: "P1"
+            targetPlayer: "P1",
+            targetId: "P1"
      });
 
     assert(
@@ -90,10 +91,11 @@ function testDealDamage(): void {
         "Player should have 40 life"
     );
 
-    DealDamage.Enqueue(state, "P2", { 
+    DealDamage.Enqueue(state, "P1", { 
             amount: 17,
             targetType: TargetType.Player,
-            targetPlayer: "P2"
+            targetPlayer: "P2",
+            targetId: "P2"
      });
     assert(
         state.players.P1.life === 39,

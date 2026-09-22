@@ -54,7 +54,7 @@ function afterEvent(
 
     triggers.forEach(e => {
         e.Behaviour.actions.forEach(a => {
-            a(state, e.Instance);
+            a(state, e.Instance, evt);
         })
     })
 }

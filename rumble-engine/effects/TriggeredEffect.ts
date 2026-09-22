@@ -5,12 +5,12 @@ import { EventType } from "../enums/EventType";
 import { TriggerDefinition } from "../enums/TriggerDefinition";
 import { Zone } from "../enums/Zone";
 import { GameEvent } from "../GameEvent";
-import { GameState, GetPlayerZone } from "../GameState";
+import { GameState, GetPlayerZone, PlayerState } from "../GameState";
 
 export interface TriggeredEffect {
     id: string;
     eventType: EventType;
-    execute(
+    discover(
         state: GameState,
         event: GameEvent
     ): void;
@@ -18,140 +18,46 @@ export interface TriggeredEffect {
 
 export function discoverTriggers(state: GameState, evt: GameEvent): TriggerReadyEffect[] {
     let effects = [] as TriggerReadyEffect[];
-    effects.push(...executeCardETBTrigger(state, evt));
-    effects.push(...executeCardLTBTrigger(state, evt));
+    effects.push(...discoverCardETBTrigger(state, evt));
+    effects.push(...discoverCardLTBTrigger(state, evt));
+    effects.push(...discoverCardDrawtrigger(state, evt));
 
     return effects;
 }
 
-function executeCardETBTrigger(state: GameState, evt: GameEvent): TriggerReadyEffect[] {
+function discoverCardDrawtrigger(state: GameState, evt: GameEvent): TriggerReadyEffect[]{
+    if(evt.type != EventType.DrawCard) return [];
+    return discoverTriggersForAllPlayers(TriggerDefinition.onDraw, state, evt);
+}
+
+function discoverCardETBTrigger(state: GameState, evt: GameEvent): TriggerReadyEffect[] {
     if(evt.type != EventType.MoveCard) return [];
     let args = evt.args as MoveExpectedArgs;
 
     if(args.fromZone == Zone.Battlefield || args.toZone != Zone.Battlefield) return [];
-    let triggerReadyEffects = [] as TriggerReadyEffect[];
-    for(const playerIndex in state.players){
-        let player = state.players[playerIndex];
-        player.battlefield.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Battlefield) && behaviour.trigger == TriggerDefinition.onEnterBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-
-        
-        player.graveyard.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Graveyard) && behaviour.trigger == TriggerDefinition.onEnterBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-
-        
-        player.command.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Command) && behaviour.trigger == TriggerDefinition.onEnterBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-
-        
-        player.exile.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Exile) && behaviour.trigger == TriggerDefinition.onEnterBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        }); 
-    }
-    return triggerReadyEffects;
+    return discoverTriggersForAllPlayers(TriggerDefinition.onEnterBattlefield, state, evt);
 }
 
 
 
-function executeCardLTBTrigger(state: GameState, evt: GameEvent): TriggerReadyEffect[] {
+function discoverCardLTBTrigger(state: GameState, evt: GameEvent): TriggerReadyEffect[] {
     if(evt.type != EventType.MoveCard) return [];
     let args = evt.args as MoveExpectedArgs;
 
     if(args.fromZone != Zone.Battlefield || args.toZone == Zone.Battlefield) return [];
-    let triggerReadyEffects = [] as TriggerReadyEffect[];
-    for(const playerIndex in state.players){
-        let player = state.players[playerIndex];
-        player.battlefield.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Battlefield) && behaviour.trigger == TriggerDefinition.onLeaveBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-
-        
-        player.graveyard.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Graveyard) && behaviour.trigger == TriggerDefinition.onLeaveBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-
-        
-        player.command.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Command) && behaviour.trigger == TriggerDefinition.onLeaveBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-
-        
-        player.exile.forEach(card => {
-            card.card.behaviors.forEach(behaviour => {
-                if(behaviour.activeZones.includes(Zone.Exile) && behaviour.trigger == TriggerDefinition.onLeaveBattlefield && checkConditions(behaviour, state,evt,card)) {
-                    triggerReadyEffects.push({
-                        Instance: card,
-                        Behaviour: behaviour,
-                        Controller: playerIndex
-                    })
-                }
-            });
-        });
-    }
+    let triggerReadyEffects = discoverTriggersForAllPlayers(TriggerDefinition.onLeaveBattlefield, state, evt);
 
     let playerId = args.toTargetPlayerId;
-    let controllingPlayer = state.players[playerId];
-    let playerZone = GetPlayerZone(controllingPlayer, args.toZone);
-    let card = playerZone.filter(x => x.instanceId == args.targetCardInstanceId)[0];
+    let destinationPlayer = state.players[playerId];
+    let playerZone = GetPlayerZone(destinationPlayer, args.toZone);
+    const card = playerZone.find(
+        x => x.instanceId === args.targetCardInstanceId
+    );
+
+    if (!card) {
+        return triggerReadyEffects;
+    }
+    
     card.card.behaviors.forEach(behaviour => {
         if(behaviour.activeZones.includes(Zone.Battlefield) && behaviour.trigger == TriggerDefinition.onLeaveBattlefield && checkConditions(behaviour, state,evt,card)) {
             triggerReadyEffects.push({
@@ -164,6 +70,35 @@ function executeCardLTBTrigger(state: GameState, evt: GameEvent): TriggerReadyEf
     
 
     return triggerReadyEffects;  
+}
+
+function discoverTriggersForAllPlayers(definition: TriggerDefinition, state: GameState, evt: GameEvent): TriggerReadyEffect[]{
+    let triggerReadyEffects = [] as TriggerReadyEffect[];
+    for(const playerIndex in state.players){
+        let player = state.players[playerIndex];
+        triggerReadyEffects.push(...discoverPlayerZoneTriggerCards(player, Zone.Battlefield, definition, state, evt));
+        triggerReadyEffects.push(...discoverPlayerZoneTriggerCards(player, Zone.Graveyard, definition, state, evt));
+        triggerReadyEffects.push(...discoverPlayerZoneTriggerCards(player, Zone.Command, definition, state, evt));
+        triggerReadyEffects.push(...discoverPlayerZoneTriggerCards(player, Zone.Exile, definition, state, evt));
+    }
+    return triggerReadyEffects;
+}
+
+function discoverPlayerZoneTriggerCards(player: PlayerState, zone: Zone, definition: TriggerDefinition, state: GameState, evt: GameEvent): TriggerReadyEffect[] {
+    const cardZone = GetPlayerZone(player, zone);
+    const triggerReadyEffects = [] as TriggerReadyEffect[];
+    cardZone.forEach(card => {
+        card.card.behaviors.forEach(behaviour => {
+            if(behaviour.activeZones.includes(zone) && behaviour.trigger == definition && checkConditions(behaviour, state,evt,card)) {
+                triggerReadyEffects.push({
+                    Instance: card,
+                    Behaviour: behaviour,
+                    Controller: player.id
+                })
+            }
+        });
+    });
+    return triggerReadyEffects;
 }
 
 export interface TriggerReadyEffect{

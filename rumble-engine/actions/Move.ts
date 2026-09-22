@@ -4,8 +4,6 @@ import { processEvent } from "../EventProcessor";
 import { GameEvent } from "../GameEvent";
 import { GameState, GetPlayerZone } from "../GameState";
 import { Action } from "./Action";
-import { CardInstance, CardRemnant } from "../cards/Card";
-import { TriggerDefinition } from "../enums/TriggerDefinition";
 
 export class Move extends Action {
 
@@ -44,13 +42,6 @@ export class Move extends Action {
         const [cardInstance] = fromZone.splice(cardIndex, 1);
 
         const toZone = GetPlayerZone(targetPlayer, args.toZone);
-        let remnant = {
-            instanceId: cardInstance.instanceId,
-            card: cardInstance.card,
-            zone: args.fromZone,
-            controllerId: cardInstance.controllerId
-        } as CardRemnant
-
         toZone.push(cardInstance);
     }
 

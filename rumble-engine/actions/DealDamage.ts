@@ -18,7 +18,8 @@ export class DealDamage extends Action {
         {
             eventId: `E${++state.eventCounter}`,
             type: EventType.DealDamage,
-            targetId: playerId,
+            sourceId: playerId,
+            targetId: args.targetPlayer,
             args: args,
             preventEventExecution: false,
             appliedEventReplacementIds: new Set(),
@@ -30,12 +31,11 @@ export class DealDamage extends Action {
         if(!event.targetId) {
             throw new Error("TargetId is required for DealDamage event.");
         }
-        const player = state.players[event.targetId];
-
+        
         let args = event.args as expectedArgs;
 
-        if(args.targetType === TargetType.Player) this.applyDamageToPlayer(state, player.id, args.amount);
-        if(args.targetType === TargetType.Card) this.applyDamageToCard(state, event.targetId, player.id, args.amount);
+        if(args.targetType === TargetType.Player) this.applyDamageToPlayer(state, args.targetId, args.amount);
+        if(args.targetType === TargetType.Card) this.applyDamageToCard(state, args.targetId, event.targetId, args.amount);
     }
 
     private applyDamageToPlayer(state: GameState, playerId: string, amount: number): void {
@@ -53,4 +53,5 @@ interface expectedArgs {
     amount: number;
     targetType: TargetType;
     targetPlayer: string;
+    targetId: string;
 }

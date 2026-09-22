@@ -11,7 +11,8 @@ const testCard: Card = {
     supertypes: [],
     oracleText: "",
     keywords: [],
-    behaviors: []
+    behaviors: [],
+    replacements: []
 };
 
 function createCardInstance(
@@ -79,7 +80,7 @@ function assert(
 function testDraw(): void {
     const state = createTestState();
 
-    Draw.Enqueue(state, "P1", { amount: 1 });
+    Draw.Enqueue(state, "P1", { amount: 1, targetPlayerId: "P1" });
 
     assert(
         state.players.P1.hand.length === 1,

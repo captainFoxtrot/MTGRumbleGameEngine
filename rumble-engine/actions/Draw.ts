@@ -13,13 +13,14 @@ export class Draw extends Action {
     ): void {
         if (typeof args.amount !== "number") args.amount = 1;
 
-        var action = new Draw(args);
+        var action = new Draw();
 
         processEvent(state, 
         {
             eventId: `E${++state.eventCounter}`,
             type: EventType.DrawCard,
-            targetId: playerId,
+            sourceId: playerId,
+            targetId: args.targetPlayerId,
             args: args,
             preventEventExecution: false,
             appliedEventReplacementIds: new Set(),
@@ -48,6 +49,7 @@ export class Draw extends Action {
     }
 }
 
-interface expectedArgs {
+export interface expectedArgs {
     amount: number;
+    targetPlayerId: string
 }

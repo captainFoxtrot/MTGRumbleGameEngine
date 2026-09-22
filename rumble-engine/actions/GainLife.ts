@@ -16,7 +16,8 @@ export class GainLife extends Action {
         processEvent(state, {
             eventId: `E${++state.eventCounter}`,
             type: EventType.GainLife,
-            targetId: playerId,
+            sourceId: playerId,
+            targetId: args.targetPlayerId,
             args: args,
             preventEventExecution: false,
             appliedEventReplacementIds: new Set(),
@@ -37,4 +38,5 @@ export class GainLife extends Action {
 
 interface expectedArgs {
     amount: number;
+    targetPlayerId: string;
 }
