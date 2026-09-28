@@ -1,6 +1,5 @@
 import { EventType } from "../enums/EventType";
 import { TargetType } from "../enums/TargetType";
-import { processEvent } from "../EventProcessor";
 import { GameEvent } from "../GameEvent";
 import { GameState } from "../GameState";
 import { Action } from "./Action";
@@ -14,7 +13,7 @@ export class DealDamage extends Action {
     ): void {
         var action = new DealDamage();
 
-        processEvent(state, 
+        state.eventProcessor.processEvent(state, 
         {
             eventId: `E${++state.eventCounter}`,
             type: EventType.DealDamage,

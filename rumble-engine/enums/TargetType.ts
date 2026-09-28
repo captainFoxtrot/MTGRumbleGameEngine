@@ -1,7 +1,7 @@
 export enum TargetType {
-    Player = "Player",
-    Card = "Card",
-    Permanent = "Permanent",
-    Spell = "Spell",
-    Ability = "Ability",
+    Player = "PLAYER",
+    Card = "CARD",
+    Permanent = "PERMANENT",
+    Spell = "SPELL",
+    Ability = "ABILITY",
 }

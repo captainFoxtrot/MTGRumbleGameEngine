@@ -1,6 +1,6 @@
 export enum CommonCardCounters {
-    Poison = "poison",
-    PowerModifier = "powerModifier",
-    ToughnessModifier = "toughnessModifier",
-    loyalty = "loyalty"
+    Poison = "POISON",
+    PowerModifier = "POWER_MODIFIER",
+    ToughnessModifier = "TOUGHNESS_MODIFIER",
+    loyalty = "LOYALTY"
 }

@@ -3,6 +3,8 @@ import { Draw } from "../rumble-engine/actions/Draw";
 import { GameState } from "../rumble-engine/GameState";
 import { Zone } from "../rumble-engine/enums/Zone";
 import { Move } from "../rumble-engine/actions/Move";
+import { EventProcessor } from "../rumble-engine/EventProcessor";
+import { Phase } from "../rumble-engine/enums/Phase";
 
 const testCard: Card = {
     id: "test-card",
@@ -14,7 +16,8 @@ const testCard: Card = {
     oracleText: "",
     keywords: [],
     behaviors: [],
-    replacements: []
+    replacements: [],
+    ongoings: []
 };
 
 function createCardInstance(
@@ -28,10 +31,11 @@ function createCardInstance(
         tapped: false,
         damageMarked: 0,
         counters: {}
-    };
+    } as CardInstance;
 }
 
 function createTestState(): GameState {
+    const eventProcessor = new EventProcessor();
     return {
         players: {
             P1: {
@@ -60,12 +64,18 @@ function createTestState(): GameState {
                 junkyard: [],
                 scrapyard: [],
                 attractions: [],
-                whammy: []
+                whammy: [],
+                hasLostOrgivenUp: false
             }
         },
+                
+        playerTurnOrder: ["P1"],
+        playerIdTurn: "P1",
+        phase: Phase.PreCombatMain,
 
         eventCounter: 0,
-        triggeredEffects: []
+
+        eventProcessor
     };
 }
 

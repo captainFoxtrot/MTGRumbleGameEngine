@@ -1,7 +1,6 @@
 import { GameState } from "../rumble-engine/GameState";
 import { Card, CardInstance } from "../rumble-engine/cards/Card";
 import { Zone } from "../rumble-engine/enums/Zone";
-import { Move } from "../rumble-engine/actions/Move";
 import { EventType } from "../rumble-engine/enums/EventType";
 import { CardType } from "../rumble-engine/enums/CardType";
 import { Draw, expectedArgs } from "../rumble-engine/actions/Draw";
@@ -10,6 +9,8 @@ import { TriggerDefinition } from "../rumble-engine/enums/TriggerDefinition";
 import { GameEvent } from "../rumble-engine/GameEvent";
 import { DealDamage } from '../rumble-engine/actions/DealDamage';
 import { TargetType } from "../rumble-engine/enums/TargetType";
+import { Phase } from "../rumble-engine/enums/Phase";
+import { EventProcessor } from "../rumble-engine/EventProcessor";
 
 const doubleDrawCard: Card = {
     id: "double-draw-card",
@@ -40,7 +41,8 @@ const doubleDrawCard: Card = {
                 return event;
             }
         }
-    ]
+    ],
+    ongoings: []
 };
 
 const punishmentCard: Card = {
@@ -76,7 +78,8 @@ const punishmentCard: Card = {
             }
         }]
     }],
-    replacements: []
+    replacements: [],
+    ongoings: []
 };
 
 const drawCard: Card = {
@@ -89,7 +92,8 @@ const drawCard: Card = {
     oracleText: "",
     keywords: [],
     behaviors: [],
-    replacements: []
+    replacements: [],
+    ongoings: []
 };
 
 function createInstance(card: Card, ownerId: string, controllerId: string): CardInstance {
@@ -107,7 +111,7 @@ function createInstance(card: Card, ownerId: string, controllerId: string): Card
         tapped: false,
         damageMarked: 0,
         counters: {}
-    };
+    } as CardInstance;
 }
 
 function createTestState(): GameState {
@@ -119,6 +123,7 @@ function createTestState(): GameState {
     const t6 = createInstance(drawCard, "P2", "P2");
     const punishmentCardInstance = createInstance(punishmentCard, "P2", "P2");
     const testCardInstance = createInstance(doubleDrawCard, "P1", "P1");
+    const eventProcessor = new EventProcessor();
     return {
         players: {
             P1: {
@@ -144,7 +149,8 @@ function createTestState(): GameState {
                 junkyard: [],
                 scrapyard: [],
                 attractions: [],
-                whammy: []
+                whammy: [],
+                hasLostOrgivenUp: false
             },
             P2: {
                 id: "P2",
@@ -169,7 +175,8 @@ function createTestState(): GameState {
                 junkyard: [],
                 scrapyard: [],
                 attractions: [],
-                whammy: []
+                whammy: [],
+                hasLostOrgivenUp: false
             },
             P3: {
                 id: "P3",
@@ -194,12 +201,18 @@ function createTestState(): GameState {
                 junkyard: [],
                 scrapyard: [],
                 attractions: [],
-                whammy: []
+                whammy: [],
+                hasLostOrgivenUp: false
             }
         },
+        
+        playerTurnOrder: ["P1"],
+        playerIdTurn: "P1",
+        phase: Phase.PreCombatMain,
 
         eventCounter: 0,
-        triggeredEffects: []
+
+        eventProcessor
     };
 }
 
@@ -244,7 +257,7 @@ function TestReplacementAndBehaviours(): void {
 
     assert(
         state.players.P2.life === 40,
-        "Player 2 should have exactly 38 life"
+        "Player 2 should have exactly 40 life"
     );
     
     Draw.Enqueue(state, "P2", { 
@@ -270,7 +283,7 @@ function TestReplacementAndBehaviours(): void {
 
     assert(
         state.players.P2.life === 40,
-        "Player 2 should have exactly 38 life"
+        "Player 2 should have exactly 40 life"
     );
 
     console.log("TestReplacementAndBehaviours passed");

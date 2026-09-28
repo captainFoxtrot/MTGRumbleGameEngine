@@ -1,8 +1,8 @@
 export enum CardBehaviorType {
-    Triggered = "Triggered",
-    Replacement = "Replacement",
-    Ongoing = "Ongoing",
-    Activated = "Activated",
-    Static = "Static",
-    Undefined = "Undefined"
+    Triggered = "TRIGGERED",
+    Replacement = "REPLACEMENT",
+    Ongoing = "ONGOING",
+    Activated = "ACTIVATED",
+    Static = "STATIC",
+    Undefined = "UNDEFINED"
 }

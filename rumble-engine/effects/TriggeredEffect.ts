@@ -7,15 +7,6 @@ import { Zone } from "../enums/Zone";
 import { GameEvent } from "../GameEvent";
 import { GameState, GetPlayerZone, PlayerState } from "../GameState";
 
-export interface TriggeredEffect {
-    id: string;
-    eventType: EventType;
-    discover(
-        state: GameState,
-        event: GameEvent
-    ): void;
-}
-
 export function discoverTriggers(state: GameState, evt: GameEvent): TriggerReadyEffect[] {
     let effects = [] as TriggerReadyEffect[];
     effects.push(...discoverCardETBTrigger(state, evt));

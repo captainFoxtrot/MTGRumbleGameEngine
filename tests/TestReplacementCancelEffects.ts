@@ -4,18 +4,23 @@ import { Zone } from "../rumble-engine/enums/Zone";
 import { Move } from "../rumble-engine/actions/Move";
 import { EventType } from "../rumble-engine/enums/EventType";
 import { CardType } from "../rumble-engine/enums/CardType";
-import { Draw } from "../rumble-engine/actions/Draw";
+import { Draw, expectedArgs } from "../rumble-engine/actions/Draw";
+import { CardBehaviorType } from "../rumble-engine/enums/CardBehaviorType";
+import { TriggerDefinition } from "../rumble-engine/enums/TriggerDefinition";
+import { GameEvent } from "../rumble-engine/GameEvent";
+import { DealDamage } from '../rumble-engine/actions/DealDamage';
+import { TargetType } from "../rumble-engine/enums/TargetType";
 import { EventProcessor } from "../rumble-engine/EventProcessor";
 import { Phase } from "../rumble-engine/enums/Phase";
 
-const doubleDrawCard: Card = {
-    id: "double-draw-card",
-    name: "Double Draw",
+const noDrawCard: Card = {
+    id: "dont-draw-card",
+    name: "Dont Draw",
     manaValue: 0,
     types: [CardType.Enchantment],
     subtypes: [],
     supertypes: [],
-    oracleText: "If you would draw a card, draw two cards instead.",
+    oracleText: "You cant draw cards.",
     keywords: [],
     behaviors: [],
     replacements: [
@@ -30,10 +35,8 @@ const doubleDrawCard: Card = {
             ],
 
             replace: (state, event, self) => {
-                const args = event.args as { amount: number };
-
-                args.amount *= 2;
-
+                if(event.type != EventType.DrawCard) return event;
+                if(event.targetId == self.controllerId) event.preventEventExecution = true;
                 return event;
             }
         }
@@ -41,6 +44,42 @@ const doubleDrawCard: Card = {
     ongoings: []
 };
 
+const punishmentCard: Card = {
+    id: "punish-card",
+    name: "Card that punish draw",
+    manaValue: 1,
+    types: [],
+    subtypes: [],
+    supertypes: [],
+    oracleText: "whenever an opponent draws a card, deal 1 damage to that player",
+    keywords: [],
+    behaviors: [{
+        id: "punish-draw-test",
+        type: CardBehaviorType.Triggered,
+        trigger: TriggerDefinition.onDraw,
+        conditions: [
+            (state: GameState, evt: GameEvent, self: CardInstance): boolean => {
+                if(evt.type != EventType.DrawCard) return false;
+                if(evt.targetId == self.controllerId) return false;
+                return true;
+            }
+        ],
+        activeZones: [Zone.Battlefield, Zone.Command],
+        actions: [(gameState: GameState, self: CardInstance, evt: GameEvent) => {
+            let args = evt.args as expectedArgs;
+            for (let i = 0; i < args.amount; i++) {
+                DealDamage.Enqueue(gameState, self.controllerId, {
+                    amount: 1,
+                    targetPlayer: evt.targetId ?? "",
+                    targetType: TargetType.Player,
+                    targetId: evt.targetId ?? ""
+                });
+            }
+        }]
+    }],
+    replacements: [],
+    ongoings: []
+};
 
 const drawCard: Card = {
     id: "draw-card",
@@ -81,7 +120,8 @@ function createTestState(): GameState {
     const t4 = createInstance(drawCard, "P2", "P2");
     const t5 = createInstance(drawCard, "P2", "P2");
     const t6 = createInstance(drawCard, "P2", "P2");
-    const testCardInstance = createInstance(doubleDrawCard, "P1", "P1");
+    const punishmentCardInstance = createInstance(punishmentCard, "P2", "P2");
+    const testCardInstance = createInstance(noDrawCard, "P1", "P1");
     const eventProcessor = new EventProcessor();
     return {
         players: {
@@ -129,7 +169,7 @@ function createTestState(): GameState {
                 exile: [],
                 battlefield: [],
 
-                command: [],
+                command: [punishmentCardInstance],
                 contraptions: [],
                 junkyard: [],
                 scrapyard: [],
@@ -184,7 +224,7 @@ function assert(
     }
 }
 
-function testReplacementEffects(): void {
+function TestReplacementAndBehaviours(): void {
     const state = createTestState();
 
     Draw.Enqueue(state, "P1", { 
@@ -193,22 +233,31 @@ function testReplacementEffects(): void {
     })
 
     assert(
-        state.players.P1.library.length === 1,
-        "Player 1 should have exactly 1 card in library but have " + state.players.P1.library.length
+        state.players.P1.library.length === 3,
+        "Player 1 should have exactly 3 card in library but have " + state.players.P1.library.length
     );
 
     
     assert(
-        state.players.P1.hand.length === 2,
-        "Player 1 should have exactly 2 card in hand  but have " + state.players.P1.hand.length
+        state.players.P1.hand.length === 0,
+        "Player 1 should have exactly 0 card in hand but have " + state.players.P1.hand.length
     );
-
     
     assert(
         state.players.P2.hand.length === 0,
         "Player 2 should have exactly 0 card in hand"
     );
 
+    assert(
+        state.players.P1.life === 40,
+        
+        "Player 1 should have exactly 40 life but have " + state.players.P1.life
+    );
+
+    assert(
+        state.players.P2.life === 40,
+        "Player 2 should have exactly 40 life"
+    );
     
     Draw.Enqueue(state, "P2", { 
         amount: 1,
@@ -226,7 +275,17 @@ function testReplacementEffects(): void {
         "Player 2 should have exactly 1 card in hand"
     );
 
-    console.log("testReplacementEffects passed");
+    assert(
+        state.players.P1.life === 40,
+        "Player 1 should have exactly 40 life"
+    );
+
+    assert(
+        state.players.P2.life === 40,
+        "Player 2 should have exactly 40 life"
+    );
+
+    console.log("TestReplacementAndBehaviours passed");
 }
 
-testReplacementEffects();
+TestReplacementAndBehaviours();

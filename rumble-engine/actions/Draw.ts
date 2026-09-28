@@ -1,5 +1,4 @@
 import { EventType } from "../enums/EventType";
-import { processEvent } from "../EventProcessor";
 import { GameEvent } from "../GameEvent";
 import { GameState } from "../GameState";
 import { Action } from "./Action";
@@ -15,7 +14,7 @@ export class Draw extends Action {
 
         var action = new Draw();
 
-        processEvent(state, 
+        state.eventProcessor.processEvent(state, 
         {
             eventId: `E${++state.eventCounter}`,
             type: EventType.DrawCard,

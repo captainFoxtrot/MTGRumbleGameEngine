@@ -1,8 +1,11 @@
 import { DealDamage } from "../rumble-engine/actions/DealDamage";
+import { Phase } from "../rumble-engine/enums/Phase";
 import { TargetType } from "../rumble-engine/enums/TargetType";
+import { EventProcessor } from "../rumble-engine/EventProcessor";
 import { GameState } from "../rumble-engine/GameState";
 
 function createTestState(): GameState {
+    const eventProcessor = new EventProcessor();
     return {
         players: {
             P1: {
@@ -28,7 +31,8 @@ function createTestState(): GameState {
                 junkyard: [],
                 scrapyard: [],
                 attractions: [],
-                whammy: []
+                whammy: [],
+                hasLostOrgivenUp: false
             },
             P2: {
                 id: "P2",
@@ -53,12 +57,18 @@ function createTestState(): GameState {
                 junkyard: [],
                 scrapyard: [],
                 attractions: [],
-                whammy: []
+                whammy: [],
+                hasLostOrgivenUp: false
             }
         },
+        
+        playerTurnOrder: ["P1"],
+        playerIdTurn: "P1",
+        phase: Phase.PreCombatMain,
 
         eventCounter: 0,
-        triggeredEffects: []
+
+        eventProcessor
     };
 }
 

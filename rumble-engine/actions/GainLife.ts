@@ -1,5 +1,4 @@
 import { EventType } from "../enums/EventType";
-import { processEvent } from "../EventProcessor";
 import { GameEvent } from "../GameEvent";
 import { GameState } from "../GameState";
 import { Action } from "./Action";
@@ -13,7 +12,7 @@ export class GainLife extends Action {
     ): void {
         if(typeof args.amount !== "number") args.amount = 1;
         var action = new GainLife();
-        processEvent(state, {
+        state.eventProcessor.processEvent(state, {
             eventId: `E${++state.eventCounter}`,
             type: EventType.GainLife,
             sourceId: playerId,

@@ -1,5 +1,7 @@
-import { Card, CardInstance, CardRemnant } from "./cards/Card";
+import { CardInstance } from "./cards/Card";
+import { Phase } from "./enums/Phase";
 import { Zone } from "./enums/Zone";
+import { EventProcessor } from "./EventProcessor";
 
 export interface PlayerState {
     id: string;
@@ -24,14 +26,38 @@ export interface PlayerState {
     scrapyard: CardInstance[];
     attractions: CardInstance[];
     whammy: CardInstance[];
+
+    hasLostOrgivenUp: boolean;
 }
 
 export interface GameState {
     players: Record<string, PlayerState>;
-
+    playerTurnOrder: string[];
     eventCounter: number;
+    playerIdTurn: string;
+    phase: Phase;
+    eventProcessor: EventProcessor;
+}
 
-    triggeredEffects: any[];
+export function GetNextPlayer(state: GameState): string | undefined{
+    const activePlayers = state.playerTurnOrder.filter(x => !state.players[x].hasLostOrgivenUp);
+
+    if(activePlayers.length <= 1) return undefined;
+
+    const activePlayer = state.playerIdTurn;
+    const currentIndex = state.playerTurnOrder.indexOf(activePlayer);
+    const playerCount = state.playerTurnOrder.length;
+    let nextPlayerIndex = currentIndex + 1;
+    if(nextPlayerIndex >= playerCount) nextPlayerIndex = 0;
+    let runs = 0;
+
+    while(state.players[state.playerTurnOrder[nextPlayerIndex]].hasLostOrgivenUp && runs < playerCount) {
+        nextPlayerIndex++;
+        if(nextPlayerIndex >= playerCount) nextPlayerIndex = 0;
+        runs++;
+    }
+
+    return state.playerTurnOrder[nextPlayerIndex];
 }
 
 export function GetPlayerZone(player: PlayerState, zone: Zone) {
