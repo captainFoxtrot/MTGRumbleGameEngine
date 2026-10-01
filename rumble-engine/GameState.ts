@@ -1,5 +1,7 @@
 import { CardInstance } from "./cards/Card";
+import { CardBehaviorType } from "./enums/CardBehaviorType";
 import { Phase } from "./enums/Phase";
+import { StackType } from "./enums/StackType";
 import { Zone } from "./enums/Zone";
 import { EventProcessor } from "./EventProcessor";
 
@@ -37,6 +39,16 @@ export interface GameState {
     playerIdTurn: string;
     phase: Phase;
     eventProcessor: EventProcessor;
+    stack: StackItem[];
+}
+
+export interface StackItem {
+    card: CardInstance;
+    originPlayerId: string;
+    originZone: Zone;
+    stackType: StackType;
+    cardBehaviourType?: CardBehaviorType | null;
+    abilityId: string | null;
 }
 
 export function GetNextPlayer(state: GameState): string | undefined{

@@ -1,7 +1,6 @@
 import { CardType } from "../enums/CardType";
 import { Keyword } from "../enums/Keyword";
 import { SuperType } from "../enums/SuperType";
-import { Zone } from "../enums/Zone";
 import { CardBehavior } from "./CardBehavior";
 import { ReplacementEffect } from '../effects/ReplacementEffect';
 import { discoverOngoings, OngoingEffect } from "../effects/OngoingEffect";
@@ -9,13 +8,15 @@ import { HookType } from "../enums/HookType";
 import { TargetType } from "../enums/TargetType";
 import { GameState } from "../GameState";
 import { CommonCardCounters } from "../enums/CommonCardCounters";
+import { Cost, CreateCost } from '../models/Cost';
+import { GameEvent } from "../GameEvent";
 
 export interface Card {
     id: string;
 
     name: string;
 
-    manaCost?: string;
+    manaCost?: Cost;
     manaValue: number;
 
     types: CardType[];
@@ -59,6 +60,18 @@ export abstract class CardInstance implements ICardInstance{
     abstract damageMarked: number;
 
     abstract counters: Record<string, number>;
+
+    GetCost(state: GameState, event: GameEvent): Cost | undefined{
+        if(!this.card.manaCost) return CreateCost();
+    
+        let cost = {...this.card.manaCost};
+
+        for (const reduction of cost.costReduction) {
+            cost = reduction(state, event, cost);
+        }
+
+        return cost;
+    }
 
     GetPower(state: GameState): number | undefined{
         if(this.card.power == undefined) return undefined;

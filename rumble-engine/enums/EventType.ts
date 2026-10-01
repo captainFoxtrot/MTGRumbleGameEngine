@@ -4,5 +4,6 @@ export enum EventType {
     DealDamage = "DEAL_DAMAGE",
     MoveCard = "MOVE_CARD",
     ExileCard = "EXILE_CARD",
-    MillCard = "MILL_CARD"
+    MillCard = "MILL_CARD",
+    CastSpell = "CAST_SPELL"
 }

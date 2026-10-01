@@ -7,16 +7,17 @@ import { Keyword } from "./enums/Keyword";
 import { Zone } from "./enums/Zone";
 import { GameEvent } from "./GameEvent";
 import { GameState, PlayerState } from "./GameState";
+import { Cost } from "./models/Cost";
 
 export class EventProcessor {
 
     eventDepth = 0;
 
-    processEvent(
+    async processEvent(
         state: GameState,
         evt: GameEvent,
-        action: Action,
-    ): void {
+        action: Action
+    ): Promise<void> {
         this.eventDepth++;
         try{
             evt = this.beforeEventReplacementEffects(state, evt);
