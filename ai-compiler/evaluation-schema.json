@@ -1,0 +1,55 @@
+{
+  "contractVersion": "1.0",
+  "repository": {
+    "url": "string",
+    "branch": "string",
+    "commit": "string|null"
+  },
+  "batch": {
+    "batchId": "string",
+    "cardCount": 0
+  },
+  "artifact": {
+    "fileName": "string",
+    "created": true,
+    "cardCount": 0
+  },
+  "results": [
+    {
+      "cardId": "string",
+      "oracleId": "string|null",
+      "name": "string",
+      "status": "SUPPORTED | SUPPORTED_WITH_ENGINE_GAPS | REVIEW_REQUIRED | UNSUPPORTED | BLOCKED",
+
+      "productionCard": {
+        "ready": true,
+        "modulePath": "string|null"
+      },
+
+      "confidence": {
+        "overall": 0.0,
+        "oracleInterpretation": 0.0,
+        "engineMapping": 0.0,
+        "functionReuse": 0.0,
+        "rulesFidelity": 0.0
+      },
+
+      "capabilitiesUsed": [],
+      "functionsUsed": [],
+      "engineRuleGaps": [],
+      "unsupportedCapabilities": [],
+      "proposedFunctions": [],
+      "proposedEngineCapabilities": [],
+
+      "validation": {
+        "schemaValid": true,
+        "typecheck": "NOT_RUN | PASSED | FAILED",
+        "behaviorTests": "NOT_RUN | PASSED | FAILED",
+        "productionReady": true,
+        "errors": []
+      },
+
+      "notes": []
+    }
+  ]
+}

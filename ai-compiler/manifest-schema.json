@@ -1,0 +1,19 @@
+{
+  "contractVersion": "1.0",
+  "batchId": "string",
+  "repository": {
+    "url": "string",
+    "branch": "string",
+    "commit": "string"
+  },
+  "cards": [
+    {
+      "cardId": "string",
+      "oracleId": "string|null",
+      "name": "string",
+      "status": "SUPPORTED | SUPPORTED_WITH_ENGINE_GAPS",
+      "modulePath": "cards/SomeCard.ts",
+      "productionReady": true
+    }
+  ]
+}
