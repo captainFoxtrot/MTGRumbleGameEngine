@@ -1,0 +1,99 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+coverage/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime / temp files
+tmp/
+temp/
+.cache/
+*.tmp
+
+# Validation API runtime artifacts
+validation-output/
+validation-artifacts/
+validation-temp/
+*.trace.json
+
+# Generated compiler / candidate artifacts
+generated/
+candidates/
+review/
+audit/
+mtg-rumble-compiled-cards.zip
+
+# Test artifacts
+test-results/
+coverage/
+.nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editor
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# Node package manager caches
+.npm/
+.pnpm-store/
+.yarn/
+
+# Lock files from alternative package managers
+# Keep the one you actually use in source control.
+# yarn.lock
+# pnpm-lock.yaml
+
+# Local SSH / credentials
+*.pem
+*.key
+*.pfx
+*.crt
+
+# Oracle / deployment local config
+deploy-local/
+secrets/
+credentials/
+
+# Local repository snapshots / isolated worker checkouts
+workspace/
+workspaces/
+scratch/
+sandbox/
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.tgz

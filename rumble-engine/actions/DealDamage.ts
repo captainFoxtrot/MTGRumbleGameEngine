@@ -48,7 +48,7 @@ export class DealDamage extends Action {
     }
 }
 
-interface expectedArgs {
+export interface expectedArgs {
     amount: number;
     targetType: TargetType;
     targetPlayer: string;

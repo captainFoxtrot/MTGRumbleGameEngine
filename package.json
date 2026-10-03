@@ -3,6 +3,10 @@
     "test": "tsx tests/TestAll.ts"
   },
   "devDependencies": {
+    "@types/node": "^26.6.4",
     "tsx": "^4.23.13"
+  },
+  "dependencies": {
+    "fastify": "^5.12.5"
   }
 }
