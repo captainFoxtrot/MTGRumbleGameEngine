@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "test": "tsx tests/TestAll.ts"
+    "test": "tsx tests/TestAll.ts",
+    "validation-api": "tsx validation-api/Server.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
