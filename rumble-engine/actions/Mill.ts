@@ -7,7 +7,7 @@ import { Move } from "./Move";
 
 export class Mill extends Action {
 
-    static override Enqueue(
+    static override ActionEnqueue(
         state: GameState,
         playerId: string,
         args: expectedArgs

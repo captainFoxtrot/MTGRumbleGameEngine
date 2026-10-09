@@ -4,8 +4,9 @@ import { GameState } from "../GameState";
 import { Action } from "./Action";
 
 export class Draw extends Action {
+    override readonly canStack = true;
 
-    static override Enqueue(
+    static override ActionEnqueue(
         state: GameState,
         playerId: string,
         args: expectedArgs

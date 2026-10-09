@@ -26,8 +26,6 @@ export class EventProcessor {
                 return;
             }
 
-            //handle player priority
-
             action.Do(state, evt);
 
             this.afterEvent(state, evt);

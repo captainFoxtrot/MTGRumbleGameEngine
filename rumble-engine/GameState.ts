@@ -4,6 +4,7 @@ import { Phase } from "./enums/Phase";
 import { StackType } from "./enums/StackType";
 import { Zone } from "./enums/Zone";
 import { EventProcessor } from "./EventProcessor";
+import { PlayerPriority } from "./PlayerPriority";
 
 export interface PlayerState {
     id: string;
@@ -40,6 +41,7 @@ export interface GameState {
     phase: Phase;
     eventProcessor: EventProcessor;
     stack: StackItem[];
+    priority: PlayerPriority; 
 }
 
 export interface StackItem {

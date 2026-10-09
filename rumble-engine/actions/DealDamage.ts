@@ -6,7 +6,7 @@ import { Action } from "./Action";
 
 export class DealDamage extends Action {
 
-    static override Enqueue(
+    static override ActionEnqueue(
         state: GameState,
         playerId: string,
         args: expectedArgs
