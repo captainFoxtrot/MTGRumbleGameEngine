@@ -1,52 +1,49 @@
-import { GameState, GetNextPlayer } from "./GameState";
+import { GameState } from "./GameState";
 
 export class PlayerPriority {
-    private resolve: any;
-    private state: GameState;
+    private state: GameState | null;
     private priorityHolder: string;
-    private priorityRounds: any[] = [];
+    private priorityInitiator: string;
 
-    constructor(state: GameState) {
-        this.state = state;
-        this.priorityHolder = state.playerIdTurn;
+    constructor() {
+        this.state = null;
+        this.priorityHolder = "";
+        this.priorityInitiator = "";
     }
 
-    public StartNewPriorityRound() {
-        this.priorityHolder = this.state.playerIdTurn;
-        new Promise(resolve => {
-            this.priorityRounds.push(resolve);
-        });
-        return this.priorityRounds[this.priorityRounds.length - 1];
+    public setState(state: GameState){
+        this.state = state;
+    }
+
+    public StartPlayerPriorityCheck(playerId: string | undefined = undefined) {
+        if(!this.state) return;
+        this.priorityHolder = playerId ?? this.state.playerIdTurn;
+        this.priorityInitiator = playerId ?? this.state.playerIdTurn;
     }
 
     public PassPriority() {
         var targetNextPlayer = this.GetNextPlayer();
-        const currentPriorityRound = this.priorityRounds[this.priorityRounds.length - 1];
-        if(!targetNextPlayer) {
-            currentPriorityRound.resolve();
+        
+        if(!targetNextPlayer || this.priorityInitiator === targetNextPlayer) {
+            return this.ResolveStackItem();
         }
+
         this.priorityHolder = targetNextPlayer ?? "";
-
-        if(this.priorityHolder == this.state.playerIdTurn){
-            currentPriorityRound.resolve();
-        }
-
-        if(this.priorityRounds.length > 0) {
-            this.priorityHolder = this.state.playerIdTurn;
-        } else {
-            return;
-        }
     }
 
-    public DequeuePriority(round: any){
-        const index = this.priorityRounds.indexOf(round);
-        if(index !== -1) {
-            this.priorityRounds.splice(index, 1);
+    private ResolveStackItem(){
+        if(!this.state) return;
+        const item = this.state.stack.pop();
+        for(const action of item?.behaviour?.actions ?? []){
+            if(!item?.card) continue;
+            action(this.state, item.card, item.triggeredEvent)
         }
+        if(this.state.stack.length > 0) this.StartPlayerPriorityCheck();
     }
 
     private GetNextPlayer(): string | undefined{
-        const activePlayers = this.state.playerTurnOrder.filter(x => !this.state.players[x].hasLostOrgivenUp);
+        if(!this.state) return;
+        const activePlayers = this.state.playerTurnOrder.filter(x => !this.state?.players[x].hasLostOrgivenUp);
 
         if(activePlayers.length <= 1) return undefined;
 
@@ -65,5 +62,4 @@ export class PlayerPriority {
 
         return this.state.playerTurnOrder[nextPlayerIndex];
     }
-
 }

@@ -11,4 +11,5 @@ export enum TriggerDefinition{
     onPlay = "ON_PLAY",
     onCast = "ON_CAST",
     onActivate = "ON_ACTIVATE",
+    noTrigger = "NO_TRIGGER",
 }

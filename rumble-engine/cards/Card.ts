@@ -1,15 +1,20 @@
-import { CardType } from "../enums/CardType";
-import { Keyword } from "../enums/Keyword";
-import { SuperType } from "../enums/SuperType";
-import { CardBehavior } from "./CardBehavior";
-import { ReplacementEffect } from '../effects/ReplacementEffect';
-import { discoverOngoings, OngoingEffect } from "../effects/OngoingEffect";
-import { HookType } from "../enums/HookType";
-import { TargetType } from "../enums/TargetType";
-import { GameState } from "../GameState";
-import { CommonCardCounters } from "../enums/CommonCardCounters";
 import { Cost, CreateCost } from '../models/Cost';
+import { Move, expectedArgs } from '../actions/Move';
+import { OngoingEffect, discoverOngoings } from "../effects/OngoingEffect";
+
+import { CardBehavior } from "./CardBehavior";
+import { CardBehaviorType } from '../enums/CardBehaviorType';
+import { CardType } from "../enums/CardType";
+import { CommonCardCounters } from "../enums/CommonCardCounters";
 import { GameEvent } from "../GameEvent";
+import { GameState } from "../GameState";
+import { HookType } from "../enums/HookType";
+import { Keyword } from "../enums/Keyword";
+import { ReplacementEffect } from '../effects/ReplacementEffect';
+import { SuperType } from "../enums/SuperType";
+import { TargetType } from "../enums/TargetType";
+import { TriggerDefinition } from '../enums/TriggerDefinition';
+import { Zone } from '../enums/Zone';
 
 export interface Card {
     id: string;
@@ -60,6 +65,30 @@ export abstract class CardInstance implements ICardInstance{
     abstract damageMarked: number;
 
     abstract counters: Record<string, number>;
+
+    Cast(state: GameState, caster: string, fromZone: Zone){
+        state.stack.push({
+            card: this,
+            originPlayerId: caster,
+            behaviour: {
+                id: "Cast",
+                type: CardBehaviorType.Cast,
+                trigger: TriggerDefinition.noTrigger,
+                conditions: [],
+                activeZones: [],
+                actions: [(state: GameState, self: CardInstance) => {
+                    Move.Enqueue(state, caster, {
+                        fromZone: fromZone,
+                        toZone: Zone.Battlefield,
+                        targetCardInstanceId: self.instanceId,
+                        toTargetPlayerId: caster,
+                        fromTargetPlayerId: caster,
+                        isCast: true
+                    } as expectedArgs)
+                }]
+            },
+        })
+    }
 
     GetCost(state: GameState, event: GameEvent): Cost | undefined{
         if(!this.card.manaCost) return CreateCost();

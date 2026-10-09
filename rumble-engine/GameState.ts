@@ -1,10 +1,10 @@
+import { CardBehavior } from "./cards/CardBehavior";
 import { CardInstance } from "./cards/Card";
-import { CardBehaviorType } from "./enums/CardBehaviorType";
-import { Phase } from "./enums/Phase";
-import { StackType } from "./enums/StackType";
-import { Zone } from "./enums/Zone";
 import { EventProcessor } from "./EventProcessor";
+import { GameEvent } from "./GameEvent";
+import { Phase } from "./enums/Phase";
 import { PlayerPriority } from "./PlayerPriority";
+import { Zone } from "./enums/Zone";
 
 export interface PlayerState {
     id: string;
@@ -47,10 +47,8 @@ export interface GameState {
 export interface StackItem {
     card: CardInstance;
     originPlayerId: string;
-    originZone: Zone;
-    stackType: StackType;
-    cardBehaviourType?: CardBehaviorType | null;
-    abilityId: string | null;
+    behaviour: CardBehavior;
+    triggeredEvent?: GameEvent;
 }
 
 export function GetNextPlayer(state: GameState): string | undefined{

@@ -1,16 +1,18 @@
-import { GameState } from "../rumble-engine/GameState";
 import { Card, CardInstance } from "../rumble-engine/cards/Card";
+
 import { CardBehavior } from "../rumble-engine/cards/CardBehavior";
 import { CardBehaviorType } from "../rumble-engine/enums/CardBehaviorType";
-import { Zone } from "../rumble-engine/enums/Zone";
-import { Draw } from "../rumble-engine/actions/Draw";
-import { TriggerDefinition } from "../rumble-engine/enums/TriggerDefinition";
-import { GameEvent } from "../rumble-engine/GameEvent";
 import { DealDamage } from "../rumble-engine/actions/DealDamage";
-import { Move } from "../rumble-engine/actions/Move";
-import { TargetType } from "../rumble-engine/enums/TargetType";
+import { Draw } from "../rumble-engine/actions/Draw";
 import { EventProcessor } from "../rumble-engine/EventProcessor";
+import { GameEvent } from "../rumble-engine/GameEvent";
+import { GameState } from "../rumble-engine/GameState";
+import { Move } from "../rumble-engine/actions/Move";
 import { Phase } from "../rumble-engine/enums/Phase";
+import { PlayerPriority } from "../rumble-engine/PlayerPriority";
+import { TargetType } from "../rumble-engine/enums/TargetType";
+import { TriggerDefinition } from "../rumble-engine/enums/TriggerDefinition";
+import { Zone } from "../rumble-engine/enums/Zone";
 
 class TestCardInstance extends CardInstance {
     instanceId: string;
@@ -92,7 +94,7 @@ const testCard: Card = {
                         {
                             amount: 1,
                             targetPlayerId:
-                                self.controllerId
+                            self.controllerId
                         }
                     );
                 },
@@ -317,7 +319,9 @@ function createTestState(): GameState {
 
         eventCounter: 0,
 
-        eventProcessor
+        eventProcessor,
+        stack: [],
+        priority: new PlayerPriority()
     };
 }
 
@@ -353,7 +357,7 @@ function testCardBehaviour(): void {
             fromTargetPlayerId: "P1",
 
             isCast: true
-        }
+        },
     );
 
     assert(

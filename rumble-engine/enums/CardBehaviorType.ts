@@ -4,5 +4,6 @@ export enum CardBehaviorType {
     Ongoing = "ONGOING",
     Activated = "ACTIVATED",
     Static = "STATIC",
+    Cast = "CAST",
     Undefined = "UNDEFINED"
 }
